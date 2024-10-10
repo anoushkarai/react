@@ -1,0 +1,70 @@
+import React, { useState, useEffect } from "react";
+
+function App() {
+  const [catPicture, setCatPicture] = useState("");
+  const [buttonStyle, setButtonStyle] = useState({});
+  const [error, setError] = useState(null);
+
+  // Generate a random cat picture URL
+  const getCatPicture = () => {
+    const url = `https://cataas.com/cat?${Math.random()}`;
+    fetch(url)
+      .then((response) => response.url) // Get the URL of the cat image
+      .then((url) => {
+        setCatPicture(url); // Set the catPicture state with the URL
+      })
+      .catch((error) => {
+        setError(error.message);
+        setTimeout(getCatPicture, 1000); // retry after 1 second
+      });
+  };
+
+  // Change button location every 7 seconds
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      const top = Math.floor(Math.random() * 500);
+      const left = Math.floor(Math.random() * 800);
+      setButtonStyle({
+        position: "absolute",
+        top: `${top}px`,
+        left: `${left}px`,
+      });
+    }, 7000);
+    return () => clearInterval(intervalId);
+  }, []);
+
+  // Update button location on click
+  const handleClick = () => {
+    getCatPicture(); // Call getCatPicture here
+    const top = Math.floor(Math.random() * 500);
+    const left = Math.floor(Math.random() * 800);
+    setButtonStyle({
+      position: "absolute",
+      top: `${top}px`,
+      left: `${left}px`,
+    });
+  };
+
+  useEffect(() => {
+    getCatPicture(); // Call getCatPicture here to load the initial cat picture
+  }, []);
+
+  return (
+    <div>
+      {error ? (
+        <p style={{ color: "red" }}>{error}</p>
+      ) : (
+        <img
+          src={catPicture}
+          alt="Random Cat Picture"
+          style={{ width: "400px", height: "400px" }}
+        />
+      )}
+      <button style={buttonStyle} onClick={handleClick}>
+        Get Random Cat Picture
+      </button>
+    </div>
+  );
+}
+
+export default App;
